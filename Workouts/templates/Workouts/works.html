@@ -1,0 +1,177 @@
+b{%extends "Workouts/base.html"%}
+{%load static%}
+{%block title%}Your Workouts | Gymbuddy{%endblock%}
+{% load crispy_forms_tags %}
+{%block body%}
+<br>
+<div class="container">
+<h6 class="display-6">Work outs</h6>
+<div id="workouts" class="row"></div>
+<!-- Form for workouts update -->
+
+<!-- Modal -->
+<div class="modal fade" id="Update-Modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Update workout</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" style="background-color: aquamarine;">
+        <div id="alert-boxupdate"></div>
+       <form id="Update-form" action="">
+        {{form|crispy}}
+       {%csrf_token%}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save changes</button>
+      </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- FORM FOR UPDATE ENDS -->
+</div>
+<script>
+  const elementid = window.location.pathname.split('/').pop();
+  const space = document.getElementById("workouts")
+  const alertBoxUpdate = document.getElementById("alert-boxupdate")
+  const UpdateModal = document.getElementById("Update-Modal")
+  const updateForm = document.getElementById("Update-form")
+  const workout_fi = document.getElementById("id_Workout_name")
+  const muscle_fi = document.getElementById("id_Muscle_group")
+  const rep1_fi = document.getElementById("id_Rep1")
+  const weight1_fi = document.getElementById("id_Weight1")
+  const rep2_fi = document.getElementById("id_Rep2")
+  const weight2_fi = document.getElementById("id_Weight2")
+  const rep3_fi = document.getElementById("id_Rep3")
+  const weight3_fi = document.getElementById("id_Weight3")
+  const csrf = document.getElementsByName('csrfmiddlewaretoken')
+  const handleAlerts = (type,msg) =>{
+    alertBoxUpdate.innerHTML = `
+          <div class="alert alert-${type}" role="alert">
+        ${msg}
+        </div>
+          `};
+  
+  console.log(elementid)
+$.ajax({
+  type:'GET',
+  url: `${elementid}/ajax_works_view/`,
+  success: function(response){
+    console.log(response.data)
+    const data = response.data
+    data.forEach((element,index) => {
+space.innerHTML += `
+<div class="col-4">
+<div class="card" style="width: 18rem;">
+  <div class="card-body">
+    <h5 class="card-title" >Workout : <span id="workout_name_${element.id}">${element.Workout_name}</span></h5>
+    <p class="card-text" >Muscle group: <span id="muscle_group_${element.id}">${element.Muscle_group}</span></p>
+    <hr>
+    <p class="card-text" >Rep1: <span id="rep1_${element.id}">${element.Rep1}</span></p>
+    <p class="card-text" >Weight1: <span id="weight1_${element.id}">${element.Weight1}</span></p>
+    <hr>
+    <p class="card-text" >Rep2: <span id="rep2_${element.id}">${element.Rep2}</span></p>
+    <p class="card-text" >Weight2: <span id="weight2_${element.id}">${element.Weight2}</span></p>
+    <hr>
+    <p class="card-text">Rep3: <span id="rep3_${element.id}">${element.Rep3}</span></p>
+    <p class="card-text">Weight3: <span id="weight3_${element.id}">${element.Weight3}</span></p>
+    <hr>
+  <center> <button class="update-button btn btn-primary" data-bs-toggle="modal" data-object-id=${element.id} data-bs-target="#Update-Modal"  >Update workout</button></center>
+  </div>
+</div>
+</div>
+
+
+`
+
+    });
+  },
+  error: function(error){
+    console.log("error")
+  }
+})
+let objectIdupdate
+  const handleUpdateButtonClick = (event) => {
+  if (event.target.classList.contains("update-button")) {
+    const button = event.target;
+    console.log(button)
+    objectIdupdate = button.getAttribute("data-object-id");
+    console.log(objectIdupdate)
+    const row = button.closest(".card-body")
+    workout_name = row.querySelector(`#workout_name_${objectIdupdate}`);
+    muscle_group = row.querySelector(`#muscle_group_${objectIdupdate}`);
+    rep1 = row.querySelector(`#rep1_${objectIdupdate}`)
+    weight1 = row.querySelector(`#weight1_${objectIdupdate}`)
+    rep2 = row.querySelector(`#rep2_${objectIdupdate}`)
+    weight2 = row.querySelector(`#weight2_${objectIdupdate}`)
+    rep3 = row.querySelector(`#rep3_${objectIdupdate}`)
+    weight3 = row.querySelector(`#weight3_${objectIdupdate}`)
+    const new_w_name = workout_name.textContent
+    const new_muscle = muscle_group.textContent
+    console.log(new_muscle)
+    const new_rep1 = rep1.textContent
+    const new_weight1 = weight1.textContent
+    const new_rep2 = rep2.textContent
+    const new_weight2 = weight2.textContent
+    const new_rep3 = rep3.textContent
+    const new_weight3 = weight3.textContent
+     workout_fi.value = new_w_name
+   muscle_fi.value = new_muscle
+   rep1_fi.value = new_rep1
+   weight1_fi.value = new_weight1
+   rep2_fi.value = new_rep2
+   weight2_fi.value = new_weight2
+   rep3_fi.value = new_rep3
+   weight3_fi.value = new_weight3
+      // Rest of your edit button logic...
+    // console.log(objectIdview)
+  }
+};      
+updateForm.addEventListener("submit",event =>{
+  event.preventDefault()
+  $.ajax({
+type:'POST',
+url: `${objectIdupdate}/updatework/` ,
+data:{
+'csrfmiddlewaretoken':csrf[0].value,
+'Workout_name': workout_fi.value,
+'Muscle_group': muscle_fi.value,
+'Rep1': rep1_fi.value,
+'Weight1': weight1_fi.value,
+'Rep2': rep2_fi.value,
+'Weight2': weight2_fi.value,
+'Rep3': rep3_fi.value,
+'Weight3': weight3_fi.value,
+          
+
+},
+success: function(response){
+console.log("SUCESSSSS")
+handleAlerts('success',`Work out edited!`)
+
+workout_name.textContent = workout_fi.value
+muscle_group.textContent = muscle_fi.value
+rep1.textContent = rep1_fi.value
+weight1.textContent = weight1_fi.value
+rep2.textContent = rep2_fi.value
+weight2.textContent = weight2_fi.value
+rep3.textContent = rep3_fi.value
+weight3.textContent = weight3_fi.value
+
+},
+error: function(error){
+// console.log(State_s.value)
+console.log(error)
+}
+
+
+
+})
+})
+space.addEventListener("click", handleUpdateButtonClick);
+</script>
+{%endblock%}
+

@@ -1,0 +1,48 @@
+{%extends "Workouts/base.html"%}
+{%load static%}
+{%block title%}Home | Gymbuddy{%endblock%}
+
+{%block body%}
+<div class="container">
+<br>
+<div class="row"id="workout_space">
+
+
+</div>
+
+<button class="btn btn-info">Add workout +</button>
+</div>
+<script>
+  const url = window.location.href
+  const w_space = document.getElementById("workout_space")
+  $.ajax({
+    type:'GET',
+    url: `Workouts/ajax_workout/`,
+    success: function(response){
+      console.log(response.data)
+      const data = response.data
+      
+      data.forEach((element,index) => {
+      
+        w_space.innerHTML += 
+        `<div class="col-sm-6 mb-3 ">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">${element.title}</h5>
+        <p class="card-text">Total workouts: ${element.w_count}</p>
+        <p class="card-text"> Time to complete : 60 min</p>
+        <a href="${element.url}" class="btn btn-primary ancher">Open workout</a>
+      </div>
+    </div>
+  </div>`
+      });
+    },
+    error: function(error){
+      console.log("error")
+    }
+  })
+
+</script>
+
+
+{%endblock%}
