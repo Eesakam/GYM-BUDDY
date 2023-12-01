@@ -64,7 +64,7 @@ $.ajax({
     const data = response.data
     data.forEach((element,index) => {
 space.innerHTML += `
-<div class="col-4">
+<div class="col-sm-4">
 <div class="card" style="width: 18rem;">
   <div class="card-body">
     <h5 class="card-title" >Workout : <span id="workout_name_${element.id}">${element.Workout_name}</span></h5>
